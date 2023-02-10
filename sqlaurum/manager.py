@@ -158,10 +158,10 @@ class ModelQueryManager(BaseQueryManager, Generic[M]):
             self._stmt = query
         return await super().scalars(*args, **kwargs)
 
-    def update(self, values: Any | None = None, **kwargs):
+    def update(self, values: Any | None = None, **kwargs):  # type: ignore
         return super().update(self.model, values, **kwargs)
 
-    def insert(self, values: Any | None = None, return_results: bool = True, **kwargs):
+    def insert(self, values: Any | None = None, return_results: bool = True, **kwargs):  # type: ignore
         super().insert(self.model, values, return_results=return_results)
 
         if self.supports_on_conflict:
