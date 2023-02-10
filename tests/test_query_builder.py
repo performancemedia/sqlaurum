@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 import pytest
 import sqlalchemy.exc
 
@@ -60,7 +62,8 @@ async def test_default_upsert(user_manager):
 
 
 async def test_insert_no_conflict(user_manager):
-    await user_manager.insert({"name": "test"}, ignore_conflicts=True)
-    await user_manager.insert({"name": "test"}, ignore_conflicts=True)
+    _id = uuid4()
+    await user_manager.insert({"id": _id, "name": "test"}, ignore_conflicts=True)
+    await user_manager.insert({"id": _id, "name": "test"}, ignore_conflicts=True)
     users = await user_manager.select().all()
     assert len(users) == 1
