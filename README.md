@@ -1,6 +1,24 @@
-# sqlaurum
+# SQLAurum
 
-SQLAlchemy asyncio session and core query wrapper with useful utils.
+[//]: # (![Checks]&#40;https://img.shields.io/github/checks-status/performancemedia/sqlaurum/master&#41;)
+
+![CI](https://github.com/performancemedia/sqlaurum/workflows/CI/badge.svg)
+
+[//]: # (![Build]&#40;https://github.com/performancemedia/sqlaurum/workflows/Publish/badge.svg&#41;)
+
+[//]: # (![License]&#40;https://img.shields.io/github/license/performancemedia/sqlaurum&#41;)
+
+[//]: # (![Python]&#40;https://img.shields.io/pypi/pyversions/sqlaurum&#41;)
+
+[//]: # (![Format]&#40;https://img.shields.io/pypi/format/sqlaurum&#41;)
+
+[//]: # (![PyPi]&#40;https://img.shields.io/pypi/v/sqlaurum&#41;)
+
+![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)
+[![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
+
+
+*SQLAlchemy asyncio session and core query wrapper with useful utils.*
 
 ## About
 
