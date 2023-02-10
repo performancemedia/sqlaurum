@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 import pytest
 import sqlalchemy.exc
 
@@ -23,11 +25,12 @@ async def test_user_manager_await_one_or_none(user_manager):
 
 async def test_manager_insert(user_manager):
     result = await user_manager.insert({"name": "test"})
-    result1 = result.scalars().one()
     result2 = await user_manager.select().all()
     assert len(result2) == 1
-    assert result2 == [result1]
-    assert result2[0].id == result1.id
+    if user_manager.supports_returning:
+        result1 = result.scalars().one()
+        assert result2 == [result1]
+        assert result2[0].id == result1.id
 
 
 async def test_manager_delete(user_manager):
@@ -59,7 +62,8 @@ async def test_default_upsert(user_manager):
 
 
 async def test_insert_no_conflict(user_manager):
-    await user_manager.insert({"name": "test"}, ignore_conflicts=True)
-    await user_manager.insert({"name": "test"}, ignore_conflicts=True)
-    users = await user_manager.all()
+    _id = uuid4()
+    await user_manager.insert({"id": _id, "name": "test"}, ignore_conflicts=True)
+    await user_manager.insert({"id": _id, "name": "test"}, ignore_conflicts=True)
+    users = await user_manager.select().all()
     assert len(users) == 1

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import functools
 from contextlib import asynccontextmanager
-from typing import cast
+from typing import cast, Type
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
@@ -42,7 +42,7 @@ def get_query_manager_class(
         cls = SQLiteQueryManager
 
     if base:
-        return cast(type[ModelQueryManager], type("", (base, cls), {}))
+        return cast(Type[ModelQueryManager], type("", (base, cls), {}))
 
     return cls
 
