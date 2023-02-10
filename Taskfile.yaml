@@ -1,0 +1,38 @@
+version: '3'
+
+vars:
+  REGISTRY: localhost:5005
+  APP_NAME: sqlaurum
+
+tasks:
+  test:
+    desc: "Run pytest"
+    cmds:
+      - poetry run pytest -v
+
+  lint:
+    desc: "Run black & flake8"
+    cmds:
+      - poetry run black ./{{.APP_NAME}}
+      - poetry run flake8 ./{{.APP_NAME}}
+
+  version:
+    desc: Print current version
+    silent: true
+    cmds:
+      - poetry run semantic-release print-version --current
+
+  patch:
+    desc: Bump patch version
+    cmds:
+      - poetry run semantic-release version --patch
+
+  minor:
+    desc: Bump minor version
+    cmds:
+      - poetry run semantic-release version --minor
+
+  semrel:
+    desc: Automatically generate next version from commit message
+    cmds:
+      - poetry run semantic-release version
