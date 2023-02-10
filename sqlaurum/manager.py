@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
-from typing import Any, Generic, Sequence, TypeVar
+from typing import Any, Generic, Sequence, TypeVar, Type
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,7 +9,7 @@ from sqlalchemy.orm import DeclarativeBase
 
 from sqlaurum.types import OnConflict
 
-M = TypeVar("M", bound=type[DeclarativeBase])
+M = TypeVar("M", bound=Type[DeclarativeBase])
 
 
 class BaseQueryManager:

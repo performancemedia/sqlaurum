@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Protocol, TypedDict
+from typing import Any
+from typing_extensions import Protocol, TypedDict
 
 
 class OnConflict(TypedDict, total=False):
