@@ -51,6 +51,9 @@ class BaseQueryManager:
         assert self._session, "Session not set"
         return self._session
 
+    async def flush(self, objects=None) -> None:
+        await self.session.flush(objects)
+
     async def commit(self, raise_on_exception: bool = True) -> None:
         try:
             await self.session.commit()
@@ -63,6 +66,12 @@ class BaseQueryManager:
     async def transaction(self):
         async with self.session.begin():
             yield
+
+    def add(self, instance) -> None:
+        self.session.add(instance)
+
+    def add_all(self, instances) -> None:
+        self.session.add_all(instances)
 
     async def execute(self, *args, **kwargs):
         if len(args) == 0:

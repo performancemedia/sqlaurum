@@ -2,7 +2,10 @@
 name = "sqlaurum"
 version = "0.1.0"
 description = "SQLAlchemy session and query wrapper."
-authors = []
+readme = "README.md"
+authors = [
+    "Radzim Kowalow <radzim.kowalow@performance-media.pl>"
+]
 
 [tool.poetry.dependencies]
 python = ">=3.7,<4.0"
