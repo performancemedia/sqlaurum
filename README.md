@@ -37,7 +37,7 @@ from one object which provides somewhat of repository pattern. This solution has
 ```python
 import sqlalchemy as sa
 from sqlalchemy.orm import declarative_base
-from sqlaurum import UUID, GenerateUUID, get_query_manager_class
+from sqlaurum import UUID, GenerateUUID, create_repository_class
 
 Base = declarative_base()
 
@@ -48,34 +48,34 @@ class User(Base):
         )
         name = sa.Column(sa.Unicode(255))
 
-Manager = get_query_manager_class("postgresql")
+Repository = create_repository_class("postgresql")
 
-class UserManager(Manager[User]):
+class UserRepository(Repository[User]):
     
     
     async def get_user_by_name(self, name: str):
         # custom user function
         return await self.select().filter_by(name=name).one()
 
-user_manager = UserManager(...)
+user_repository = UserRepository(...)
 
 # select
-await user_manager.all()
-await user_manager.select().where(User.name == "test")
+await user_repository.all()
+await user_repository.select().where(User.name == "test")
 
 # insert
-user = await user_manager.insert({"name": "test"}).one()
+user = await user_repository.insert({"name": "test"}).one()
 
-await user_manager.commit()
+await user_repository.commit()
 # upsert
-await user_manager.upsert({"name": "John"})
+await user_repository.upsert({"name": "John"})
 
 # delete
-await user_manager.delete(name="John")
+await user_repository.delete(name="John")
 
 # custom sqlalchemy core functions
 
-users = await user_manager.select().join(...).filter(
+users = await user_repository.select().join(...).filter(
     User.name == "test"
 ).filter_by(...).order_by(User.created_at).limit(2).all()
 
@@ -89,34 +89,22 @@ to provide the session object by yourself, by subclassing Manager class e.g.
 
 ```python
 from fastapi import Depends
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlaurum import get_query_manager_class
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlaurum import create_session_factory, create_repository_class
 
 engine = create_async_engine("sqlite+aiosqlite:///:memory:")
-async_session = async_sessionmaker(engine, expire_on_commit=False)
+get_db = create_session_factory(engine)
 
-async def get_db():
-    async with async_session() as db_session:
-        try:
-            yield db_session
-            await db_session.commit()
-        except: # noqa
-            await db_session.rollback()
-            raise
-        finally:
-            await db_session.close()
-
-AbstractManager = get_query_manager_class(engine)
+AbstractRepository = create_repository_class(engine)
 
 
-
-class BaseManager(AbstractManager, abstract=True):
+class Repository(AbstractRepository, abstract=True):
     """Base manager, which uses fastapi depends to get session object"""
 
     def __init__(self, session: AsyncSession = Depends(get_db)):
         super().__init__(session)
 
-class UserManager(BaseManager[User]):
+class UserRepository(Repository[User]):
     ...
         
 # then in fastapi
@@ -125,7 +113,7 @@ from fastapi import FastAPI
 app = FastAPI()
 
 @app.get("/users")
-async def get_users(m: UserManager = Depends(UserManager)):
-    return await m.all()
+async def get_users(user_repository: UserRepository = Depends(UserRepository)):
+    return await user_repository.all()
 
 ```

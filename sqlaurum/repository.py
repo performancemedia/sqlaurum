@@ -12,7 +12,7 @@ from sqlaurum.types import OnConflict
 M = TypeVar("M", bound=Type[DeclarativeBase])
 
 
-class BaseQueryManager:
+class BaseSQLAlchemyRepository:
     supports_returning: bool = False
 
     _insert = staticmethod(sa.insert)
@@ -131,7 +131,7 @@ class BaseQueryManager:
         return self
 
 
-class ModelQueryManager(BaseQueryManager, Generic[M]):
+class SQLAlchemyModelRepository(BaseSQLAlchemyRepository, Generic[M]):
     """Base class which provides both SQLAlchemy core (with bound model) and session interfaces"""
 
     supports_on_conflict: bool = False
@@ -192,14 +192,19 @@ class ModelQueryManager(BaseQueryManager, Generic[M]):
         self._stmt = self._select(*args, **kwargs)
         return self
 
-    def upsert(self, values: Any | None = None, return_result: bool = True, **kwargs):
+    def upsert(
+        self,
+        values: Any | None = None,
+        return_result: bool = True,
+        set_: set[str] | None = None,
+        **kwargs,
+    ):
         assert (
             self.supports_on_conflict
         ), f"{type(self).__name__} does not support upsert"
         self.insert(values, return_result=return_result)
-        kwargs.update(self.on_conflict)
-        set_ = kwargs.pop("set_", None)
-        if set_:
-            kwargs["set_"] = {k: getattr(self._stmt.excluded, k) for k in set_}
+        kwargs.update(**self.on_conflict)
+        set_ = set_ or self.on_conflict["set_"]
+        kwargs["set_"] = {k: getattr(self._stmt.excluded, k) for k in set_}
         self._stmt = self._stmt.on_conflict_do_update(**kwargs)
         return self

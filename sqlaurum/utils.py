@@ -2,20 +2,21 @@ from __future__ import annotations
 
 import functools
 from contextlib import asynccontextmanager
-from typing import cast, Type
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
-from sqlaurum import ModelQueryManager
+from sqlaurum.repository import SQLAlchemyModelRepository
 
 
-def get_dialect(
+def get_dialect_name(
     obj: str | AsyncSession | AsyncEngine,
-) -> type[sa.Dialect]:
+) -> str:
     """
     Get the dialect of a session, engine, or connection url.
     """
+    if isinstance(obj, str):
+        return obj
     if isinstance(obj, AsyncSession):
         url = obj.bind.url  # type: ignore
     elif isinstance(obj, AsyncEngine):
@@ -26,32 +27,26 @@ def get_dialect(
     return url.get_dialect()  # type: ignore
 
 
-def get_query_manager_class(
-    obj, base: type[object] | None = None
-) -> type[ModelQueryManager]:
-    dialect = get_dialect(obj)
-    cls = ModelQueryManager
+def create_repository_class(obj) -> type[SQLAlchemyModelRepository]:
+    dialect = get_dialect_name(obj)
 
-    if dialect.name == "postgres":
-        from .dialects.postgres import PostgresQueryManager
+    if dialect == "postgres":
+        from .dialects.postgres import PostgresModelRepository
 
-        cls = PostgresQueryManager
-    elif dialect.name == "sqlite":
-        from .dialects.sqlite import SQLiteQueryManager
+        return PostgresModelRepository
 
-        cls = SQLiteQueryManager
+    elif dialect == "sqlite":
+        from .dialects.sqlite import SqliteModelRepository
 
-    if base:
-        return cast(Type[ModelQueryManager], type("", (base, cls), {}))
+        return SqliteModelRepository
 
-    return cls
+    return SQLAlchemyModelRepository
 
 
-def get_session_factory(engine: AsyncEngine, **kwargs):
+def create_session_factory(engine: AsyncEngine, **kwargs):
 
     async_session = async_sessionmaker(engine, expire_on_commit=False, **kwargs)
 
-    @asynccontextmanager
     async def get_session():
         async with async_session() as session:
             try:
@@ -65,11 +60,13 @@ def get_session_factory(engine: AsyncEngine, **kwargs):
 
 
 def inject_session(session_maker):
+    session_scope = asynccontextmanager(session_maker)
+
     def wrapper(func):
         @functools.wraps(func)
         async def wrapped(*args, **kwargs):
             if "db" not in kwargs or kwargs["db"] is None:
-                async with session_maker() as session:
+                async with session_scope() as session:
                     kwargs["session"] = session
                     return await func(*args, **kwargs)
 
