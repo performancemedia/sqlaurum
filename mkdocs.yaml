@@ -4,14 +4,11 @@ theme:
   name: "material"
   palette:
   - scheme: default
-    primary: cyan
-    accent: teal
+
     toggle:
       icon: material/toggle-switch
       name: Switch to dark mode
   - scheme: slate
-    primary: cyan
-    accent: teal
     toggle:
       icon: material/toggle-switch-off-outline
       name: Switch to light mode
@@ -24,6 +21,9 @@ repo_url: https://github.com/performancemedia/sqlaurum
 nav:
   - "SQLAurum": index.md
   - "Installation": installation.md
+  - "Usage": usage.md
+  - "Alembic Migrations": migrations.md
+  - "Repository Pattern": repository.md
 
 markdown_extensions:
   - pymdownx.highlight:

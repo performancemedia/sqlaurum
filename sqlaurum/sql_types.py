@@ -8,7 +8,7 @@ from sqlalchemy import CHAR, TypeDecorator
 from sqlalchemy.dialects import postgresql, sqlite
 from sqlalchemy.sql.type_api import TypeEngine
 
-from sqlaurum.types import PydanticP
+from .types import PydanticP
 
 _T = TypeVar("_T", bound=PydanticP)
 

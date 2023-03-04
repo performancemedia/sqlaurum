@@ -1,13 +1,13 @@
 import pytest
 import pytest_asyncio
-
 import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from sqlaurum.dialects.sqlite import SQLiteQueryManager
+from sqlaurum.dialects.sqlite import SqliteModelRepository
 from sqlaurum.function_elements import GenerateUUID
 from sqlaurum.sql_types import UUID
+from sqlaurum.utils import create_repository_class
 
 
 @pytest.fixture(scope="session")
@@ -52,15 +52,22 @@ async def user_model(engine):
 
 
 @pytest.fixture()
-def user_manager_class(user_model):
-    class UserManager(SQLiteQueryManager[user_model]):
+def repo_cls():
+    cls = create_repository_class("sqlite")
+    assert cls is SqliteModelRepository
+    return cls
+
+
+@pytest.fixture()
+def user_repository_class(user_model, repo_cls):
+    class UserRepository(repo_cls[user_model]):
         @property
         def on_conflict(self):
             return {"set_": {"name"}, "index_elements": ["id"]}
 
-    return UserManager
+    return UserRepository
 
 
 @pytest_asyncio.fixture()
-async def user_manager(user_manager_class, session):
-    yield user_manager_class(session)
+async def user_repository(user_repository_class, session):
+    yield user_repository_class(session)

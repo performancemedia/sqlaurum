@@ -1,11 +1,9 @@
-from __future__ import annotations
 from sqlalchemy.dialects.postgresql import insert
-from sqlaurum.manager import ModelQueryManager
+
+from sqlaurum.repository import SQLAlchemyModelRepository
 
 
-class PostgresQueryManager(ModelQueryManager, abstract=True):
-
+class PostgresModelRepository(SQLAlchemyModelRepository, abstract=True):
+    _insert = staticmethod(insert)
     supports_returning = True
     supports_on_conflict = True
-
-    _insert = staticmethod(insert)
