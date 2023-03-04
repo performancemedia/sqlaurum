@@ -1,10 +1,10 @@
 import pytest
 import pytest_asyncio
-
 import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
+from sqlaurum.dialects.sqlite import SqliteModelRepository
 from sqlaurum.function_elements import GenerateUUID
 from sqlaurum.sql_types import UUID
 from sqlaurum.utils import create_repository_class
@@ -53,7 +53,9 @@ async def user_model(engine):
 
 @pytest.fixture()
 def repo_cls():
-    return create_repository_class("sqlite")
+    cls = create_repository_class("sqlite")
+    assert cls is SqliteModelRepository
+    return cls
 
 
 @pytest.fixture()

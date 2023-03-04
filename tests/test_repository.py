@@ -3,9 +3,15 @@ from uuid import uuid4
 import pytest
 import sqlalchemy.exc
 
+from sqlaurum.dialects.sqlite import SqliteModelRepository
+
 
 def test_pytest_runs():
     assert 1 == 1
+
+
+def test_user_repository_cls(user_repository):
+    assert isinstance(user_repository, SqliteModelRepository)
 
 
 async def test_user_repository(user_repository):

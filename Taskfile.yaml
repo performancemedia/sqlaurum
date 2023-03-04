@@ -1,24 +1,26 @@
 version: '3'
 
 vars:
-  REGISTRY: localhost:5005
-  APP_NAME: sqlaurum
+  DIR: ./sqlaurum
 
 tasks:
   test:
-    desc: "Run pytest"
+    desc: Run pytest
     cmds:
       - poetry run pytest -v
+  cov:
+    desc: Generate coverage report
+    cmds:
+      - poetry run pytest --junitxml=report.xml && coverage html
 
   lint:
-    desc: "Run black & flake8"
+    desc: Run black & flake8
     cmds:
-      - poetry run black ./{{.APP_NAME}}
-      - poetry run flake8 ./{{.APP_NAME}}
+      - poetry run black {{.DIR}}
+      - poetry run flake8 {{.DIR}}
 
   version:
     desc: Print current version
-    silent: true
     cmds:
       - poetry run semantic-release print-version --current
 
@@ -32,7 +34,25 @@ tasks:
     cmds:
       - poetry run semantic-release version --minor
 
-  semrel:
-    desc: Automatically generate next version from commit message
+  docs:
+    desc: Build docs
     cmds:
-      - poetry run semantic-release version
+      - mkdocs build
+
+  package:
+    desc: Build package. Similar to python setup.py build
+    cmds:
+      - poetry build
+  run:
+    desc: Run broker (task run -- nats)
+    cmds:
+      - docker-compose up -d --force-recreate --remove-orphans {{.CLI_ARGS}}
+  clean:
+    desc: Remove build/cache files
+    cmds:
+      - rm -rf build/ dist/ .eggs/ *.egg-info/ .mypy_cache/ .pytest_cache/ ./htmlcov report.xml .coverage
+
+  release:
+    desc: Upload package artifacts
+    cmds:
+      - poetry run twine upload --repository-url {{.REPOSITORY_URL}} dist/*

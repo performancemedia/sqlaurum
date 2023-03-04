@@ -1,4 +1,5 @@
 from sqlalchemy.dialects.postgresql import insert
+
 from sqlaurum.repository import SQLAlchemyModelRepository
 
 

@@ -12,7 +12,7 @@ poetry install sqlaurum
 ### Installing optional dependencies:
 
 ```shell
-pip install sqlaurum[extension]
+pip install 'sqlaurum[extension]'
 ```
 
 ### Available extensions:
@@ -24,5 +24,11 @@ pip install sqlaurum[extension]
 ### Installing multiple extensions:
 
 ```shell
-pip install sqlaurum[asyncpg, alembic]
+pip install 'sqlaurum[asyncpg, alembic]'
+```
+
+### Installing all
+
+```shell
+pip install 'sqlaurum[all]'
 ```

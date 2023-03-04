@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
-from typing import Any, Generic, Sequence, TypeVar, Type
+from typing import Any, Generic, Sequence, Type, TypeVar
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase
 
-from sqlaurum.types import OnConflict
+from .types import OnConflict
 
 M = TypeVar("M", bound=Type[DeclarativeBase])
 
@@ -95,7 +95,7 @@ class BaseSQLAlchemyRepository:
     async def mappings(self, *args, **kwargs):
         return (await self.session.execute(*args, **kwargs)).mappings()
 
-    def update(self, table, values: Any | None = None, **kwargs):
+    def update(self, table, values=None, **kwargs):
         query = self._update(table)
         if values:
             query = query.values(values, **kwargs)
@@ -105,7 +105,7 @@ class BaseSQLAlchemyRepository:
     def insert(
         self,
         table=None,
-        values: Any | None = None,
+        values=None,
         return_results: bool = True,
         **kwargs,
     ):
@@ -142,7 +142,7 @@ class SQLAlchemyModelRepository(BaseSQLAlchemyRepository, Generic[M]):
     def __init_subclass__(cls, **kwargs):
         if "abstract" not in kwargs:
             cls.model = cls.__orig_bases__[0].__args__[0]
-            assert cls.model
+            assert cls.model, f"Could not resolve model for {cls}"
 
     @property
     def on_conflict(self) -> OnConflict:
@@ -167,20 +167,18 @@ class SQLAlchemyModelRepository(BaseSQLAlchemyRepository, Generic[M]):
             self._stmt = query
         return await super().scalars(*args, **kwargs)
 
-    def update(self, values: Any | None = None, **kwargs):  # type: ignore
+    def update(self, values=None, **kwargs):  # type: ignore
         return super().update(self.model, values, **kwargs)
 
-    def insert(self, values: Any | None = None, return_results: bool = True, **kwargs):  # type: ignore
-        super().insert(self.model, values, return_results=return_results)
+    def insert(self, values=None, return_results: bool = True, ignore_conflicts: bool = False, index_where=None, **kwargs):  # type: ignore[override]
+        super().insert(self.model, values, return_results=return_results, **kwargs)
 
         if self.supports_on_conflict:
-            ignore_conflicts = kwargs.pop("ignore_conflicts", False)
             if ignore_conflicts:
-                on_conflict = {k: self.on_conflict[k] for k in ("constraint", "index_elements") if k in self.on_conflict}  # type: ignore
-                index_where = kwargs.pop("index_where", None)
-                if index_where:
-                    on_conflict["index_where"] = index_where
-                self._stmt = self._stmt.on_conflict_do_nothing(**on_conflict)
+                self._stmt = self._stmt.on_conflict_do_nothing(
+                    index_elements=self.on_conflict["index_elements"],
+                    index_where=index_where,
+                )
         return self
 
     def delete(self, *args, **kwargs):
@@ -194,17 +192,18 @@ class SQLAlchemyModelRepository(BaseSQLAlchemyRepository, Generic[M]):
 
     def upsert(
         self,
-        values: Any | None = None,
+        values,
         return_result: bool = True,
         set_: set[str] | None = None,
         **kwargs,
     ):
-        assert (
-            self.supports_on_conflict
-        ), f"{type(self).__name__} does not support upsert"
+        assert type(
+            self
+        ).supports_on_conflict, f"{type(self).__name__} does not support upsert"
         self.insert(values, return_result=return_result)
         kwargs.update(**self.on_conflict)
         set_ = set_ or self.on_conflict["set_"]
-        kwargs["set_"] = {k: getattr(self._stmt.excluded, k) for k in set_}
+        if set_:
+            kwargs["set_"] = {k: getattr(self._stmt.excluded, k) for k in set_}
         self._stmt = self._stmt.on_conflict_do_update(**kwargs)
         return self

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sqlaurum"
-version = "0.1.0"
+version = "0.0.1"
 description = "SQLAlchemy session and query wrapper."
 readme = "README.md"
 authors = [
@@ -8,7 +8,7 @@ authors = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.7,<4.0"
+python = ">=3.8.1,<4.0"
 SQLAlchemy = "^2.0.2"
 asyncpg = {version = "^0.27.0", optional = true}
 aiosqlite = {version = "^0.18.0", optional = true}
@@ -20,21 +20,20 @@ asyncpg = ["asyncpg"]
 aiosqlite = ["aiosqlite"]
 alembic = ["alembic"]
 
-[tool.poetry.dev-dependencies]
-ipython = "^7.29.0"
-flake8 = "^4.0.1"
-pytest = "^6.2.5"
-pytest-cov = "^3.0.0"
-isort = "^5.9.3"
-pytest-asyncio = "^0.17.2"
-python-semantic-release = "^7.25.0"
-bandit = "^1.7.4"
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.1"
+pytest-asyncio = "^0.20.2"
+pytest-cov = "^4.0.0"
+flake8 = "^6.0.0"
+mypy = "^0.961"
 black = "^22.3.0"
+isort = "^5.10.1"
 tox = "^3.25.0"
-fastapi = "^0.90.0"
-mypy = "^1.0.0"
-greenlet = "^2.0.2"  # only needed for M1
-mkdocs = "^1.2.3"
+bandit = "^1.7.4"
+python-semantic-release = "^7.33.2"
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.4.2"
 mkdocs-material = "^8.2.1"
 mkdocs-autorefs = "^0.4.1"
 mkdocs-gen-files = "^0.4.0"

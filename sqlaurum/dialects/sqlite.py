@@ -1,4 +1,5 @@
 import sqlite3
+
 from sqlalchemy.dialects.sqlite import insert
 
 from sqlaurum.repository import SQLAlchemyModelRepository
