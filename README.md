@@ -1,19 +1,12 @@
 # SQLAurum
 
-![Checks](https://img.shields.io/github/checks-status/performancemedia/sqlaurum/master)
-
 ![CI](https://github.com/performancemedia/sqlaurum/workflows/CI/badge.svg)
-
 ![Build](https://github.com/performancemedia/sqlaurum/workflows/Publish/badge.svg)
-
 ![License](https://img.shields.io/github/license/performancemedia/sqlaurum)
-
 ![Python](https://img.shields.io/pypi/pyversions/sqlaurum)
-
 ![Format](https://img.shields.io/pypi/format/sqlaurum)
-
 ![PyPi](https://img.shields.io/pypi/v/sqlaurum)
-
+![Mypy](https://img.shields.io/badge/mypy-checked-blue)
 ![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)
 [![security: bandit](https://img.shields.io/badge/security-bandit-yellow.svg)](https://github.com/PyCQA/bandit)
 

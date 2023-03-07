@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sqlaurum"
-version = "0.0.1"
+version = "0.1.0"
 description = "SQLAlchemy session and query wrapper."
 readme = "README.md"
 authors = [
@@ -12,7 +12,7 @@ python = ">=3.8.1,<4.0"
 SQLAlchemy = "^2.0.2"
 asyncpg = {version = "^0.27.0", optional = true}
 aiosqlite = {version = "^0.18.0", optional = true}
-alembic = {version = "^1.9.3", optional = true}
+alembic = {version = "^1.10.1", optional = true}
 
 [tool.poetry.extras]
 all = ["asyncpg", "aiosqlite", "alembic"]
@@ -57,8 +57,13 @@ version_variable = [
     'sqlaurum/_version.py:__version__',
 ]
 version_toml = 'pyproject.toml:tool.poetry.version'
+version_pattern = [
+    'docs/index.md:Version: (\d+\.\d+\.\d+)',
+    'README.md:Version: (\d+\.\d+\.\d+)'
+]
 upload_to_repository = false
 major_on_zero = true
+hvcs = "github"
 commit_message = "Bump version: {version}"
 tag_commit = false
 
