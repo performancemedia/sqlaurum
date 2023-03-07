@@ -13,7 +13,7 @@
 *Wrapper around SQLAlchemy async session, core and native features for Postgres/SQLite*
 
 ---
-Version: 0.0.1
+Version: 0.1.0
 
 Docs: [https://performancemedia.github.io/sqlaurum/](https://performancemedia.github.io/sqlaurum/)
 

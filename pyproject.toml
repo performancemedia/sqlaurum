@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sqlaurum"
-version = "0.0.1"
+version = "0.1.0"
 description = "SQLAlchemy session and query wrapper."
 readme = "README.md"
 authors = [
